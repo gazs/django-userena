@@ -164,6 +164,9 @@ class UserenaManager(UserManager):
                 return False
             else:
                 user = userena.user
+
+                old_email = user.email # TODO: find less hackish way
+
                 user.email = userena.email_unconfirmed
                 userena.email_unconfirmed, userena.email_confirmation_key = '',''
                 userena.save(using=self._db)
@@ -171,7 +174,8 @@ class UserenaManager(UserManager):
 
                 # Send the activation_complete signal
                 userena_signals.confirmation_complete.send(sender=None,
-                                                           user=user)
+                                                           user=user,
+                                                           old_email=old_email)
 
                 return user
         return False
